@@ -1,4 +1,4 @@
-#include "tuner.h"
+#include "sample.h"
 
 int factorial(int a) {
 	if(a==0) return 1;

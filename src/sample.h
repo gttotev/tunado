@@ -1,5 +1,5 @@
-#ifndef TUNER_H
-#define TUNER_H
+#ifndef SAMPLE_H
+#define SAMPLE_H
 
 #include <complex.h>
 #include <xil_types.h>

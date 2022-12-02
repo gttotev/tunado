@@ -3,8 +3,6 @@
 
 #include "qpn_port.h"
 
-#define LCD_X
-
 enum TunerSig {
     SIG_ENC_UP = Q_USER_SIG,
     SIG_ENC_DN,

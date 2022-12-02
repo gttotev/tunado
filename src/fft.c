@@ -1,4 +1,4 @@
-#include "tuner.h"
+#include "sample.h"
 
 static int reorderLUT[N_FFT];
 static float complex trigLUT[MAX_GRAB_BITS];
