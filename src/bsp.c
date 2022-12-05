@@ -26,8 +26,8 @@ XIntc intc;
 XGpio enc, btn, led, dc;
 XTmrCtr tmr;
 
-int btn_state = 0, btn_enabled = 1;
-int enc_state = 3, enc_dir = 0;
+static int btn_state = 0, btn_enabled = 1;
+static int enc_state = 3, enc_dir = 0;
 
 void bsp_timerArm() {
 	XTmrCtr_Start(&tmr, TMR_BLANK_NUM);
@@ -35,7 +35,8 @@ void bsp_timerArm() {
 
 void bsp_timerDisarm() {
 	XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
-	XTmrCtr_Reset(&tmr, TMR_BLANK_NUM);
+	// TODO: check if still works
+	// XTmrCtr_Reset(&tmr, TMR_BLANK_NUM);
 }
 
 void interrupt_tmr(void *_, u8 tmr_num) {
@@ -49,7 +50,7 @@ void interrupt_tmr(void *_, u8 tmr_num) {
 	}
 }
 
-void interrupt_enc() {
+static void interrupt_enc() {
 	u32 pins;
 	int new_state;
 
@@ -81,7 +82,7 @@ void interrupt_enc() {
 	enc_state = new_state;
 }
 
-void interrupt_btn() {
+static void interrupt_btn() {
 	XGpio_InterruptClear(&btn, XGPIO_IR_CH1_MASK);
 	if (!btn_enabled) return;
 	btn_enabled = 0;
@@ -157,4 +158,5 @@ void QF_onStartup(void) {
 
 void QF_onIdle(void) {        /* entered with interrupts locked */
     QF_INT_UNLOCK();                       /* unlock interrupts */
+	// TODO: test nested interrupts, posting from here
 }
