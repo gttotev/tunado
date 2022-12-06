@@ -1,6 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "sample.h"
 #include "qpn_port.h"
 
 enum TunerSig {
@@ -18,6 +19,9 @@ enum TunerSig {
 struct TunerHSM {
     QActive super;
     int menu;
+
+    int fft_on;
+    float complex fft_a[FFT_SIZE];
 };
 
 extern struct TunerHSM tuner_ao;

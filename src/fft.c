@@ -1,18 +1,18 @@
 #include "sample.h"
 
-static int reorderLUT[N_FFT];
-static float complex trigLUT[MAX_GRAB_BITS];
+static int reorderLUT[FFT_SIZE];
+static float complex trigLUT[GRAB_BITS];
 
 void fft_init() {
     int i, j, bit;
     float ang;
-    for (i = 0; i < MAX_GRAB_BITS; ++i) {
+    for (i = 0; i < GRAB_BITS; ++i) {
         ang = 2*PI / (1 << (i+1));
         trigLUT[i] = tcos(ang) + tsin(ang)*I;
     }
 
-	for (i = 1, j = 0; i < N_FFT; i++) {
-        bit = N_FFT >> 1;
+	for (i = 1, j = 0; i < FFT_SIZE; i++) {
+        bit = FFT_SIZE >> 1;
         for (; j & bit; bit >>= 1)
             j ^= bit;
         j ^= bit;

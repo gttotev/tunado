@@ -43,8 +43,19 @@ static QState tuner_mainmenu(struct TunerHSM *me) {
 }
 
 static QState tuner_ffthist(struct TunerHSM *me) {
+    int freq;
+    char sfreq[6];
     switch (Q_SIG(me)) {
+    case Q_ENTRY_SIG:
+        me->fft_on = 1;
+        return Q_HANDLED();
+    case Q_EXIT_SIG:
+        me->fft_on = 0;
+        return Q_HANDLED();
     case SIG_FFT_DONE:
+        freq = fft_max(me->fft_a, FFT_SIZE) * FFT_RES;
+        itoa(freq, sfreq, 10);
+        lcd_print(sfreq, 100, 100);
         return Q_HANDLED();
     case SIG_BTN_LF:
     case SIG_ENC_DN:
