@@ -29,5 +29,9 @@ void bsp_timerArm();
 void bsp_timerDisarm();
 
 void lcd_init();
+void draw_bg();
+void draw_init_mainmenu(int pos);
+void draw_erase_mainmenu(int pos);
+int draw_mainmenu(int pos, int delta);
 
 #endif

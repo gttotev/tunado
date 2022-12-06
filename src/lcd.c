@@ -172,9 +172,9 @@ void lcd_setColorBg(u8 r, u8 g, u8 b) {
 }
 
 
-void lcd_rect(int x1, int y1, int x2, int y2) {
-    int i, area = (x2 - x1 + 1) * (y2 - y1 + 1);
-    lcd_setXY(x1, y1, x2, y2);
+void lcd_rect(int x, int y, int xlen, int ylen) {
+    int i, area = xlen * ylen;
+    lcd_setXY(x, y, x+xlen, y+ylen);
     for (i = 0; i < area; i++) LCD_Write_DATA16(fch, fcl);
 }
 
