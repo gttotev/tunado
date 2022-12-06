@@ -1,4 +1,5 @@
 #include <string.h>
+#include <fastmath.h>
 
 #include "ui.h"
 #include "lcd.h"
@@ -53,4 +54,19 @@ void draw_erase_mainmenu(int pos) {
         strlen(mainmenu_txt[i])*BIGFONT_CHAR_PX,
         BIGFONT_CHAR_PX
     );
+}
+
+static int fft_hists[FFT_SIZE/2];
+void draw_ffthist(float complex *a) {
+    int i, x, m = fft_max(a, FFT_SIZE);
+    float scale = 1.0f / cabsf(a[m]);
+    lcd_setColor(COLOR_INACTIVE);
+    for (i = 1; i < FFT_SIZE/2; i += 2) {
+        x = cabsf(a[i]) * scale * LCD_X_SIZE;
+        lcd_rect(0, 32 + i/2, x, 1);
+    }
+}
+void draw_erase_ffthist() {
+    int i;
+    for (i = 1; i < FFT_SIZE/2; ++i) fft_hists[i] = 0;
 }

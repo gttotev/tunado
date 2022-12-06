@@ -85,6 +85,7 @@ static void interrupt_enc() {
 
 static void interrupt_btn() {
 	XGpio_InterruptClear(&btn, XGPIO_IR_CH1_MASK);
+	// TODO: debounce better, somehow
 	if (!btn_enabled) return;
 	btn_enabled = 0;
 	XTmrCtr_Start(&tmr, TMR_DEBTN_NUM);

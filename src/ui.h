@@ -38,4 +38,7 @@ void draw_init_mainmenu(int pos);
 void draw_erase_mainmenu(int pos);
 int draw_mainmenu(int pos, int delta);
 
+void draw_ffthist(float complex *a);
+void draw_erase_ffthist();
+
 #endif
