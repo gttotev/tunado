@@ -162,15 +162,14 @@ void bsp_init(void) {
 void QF_onStartup(void) {
 	XIntc_Start(&intc, XIN_REAL_MODE);
 	microblaze_enable_interrupts();
-	grab_start();
 }
 
 static void sample(float complex *a) {
-    int i, lim, samples = FFT_SIZE << SAMP_FACTOR;
+    int i, lim;
     for (i = 0; i < FFT_SIZE; ++i) a[i] = 0;
 
 	i = 0;
-    while (i < samples) {
+    while (i < (1<<GRAB_BITS)) {
         lim = grab_count();
         for (; i < lim; ++i) {
             a[i>>SAMP_FACTOR] += grab_read(i);
@@ -182,6 +181,12 @@ void QF_onIdle(void) {        /* entered with interrupts locked */
     QF_INT_UNLOCK();                       /* unlock interrupts */
 	// TODO: test nested interrupts, posting from here
 	if (tuner_ao.fft_on) {
+		if (tuner_ao.fft_on == 1) {  // just turned on
+			tuner_ao.fft_on = 2;
+			grab_start();
+			grab_wait(1 << GRAB_BITS);
+			grab_start();
+		}
 		sample(tuner_ao.fft_a);
 		grab_start();
 		rufft(tuner_ao.fft_a, FFT_SIZE);

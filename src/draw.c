@@ -107,9 +107,9 @@ void draw_ffthist(float complex *a) {
 
     lcd_setColor(COLOR_BG);
     lcd_setColorBg(COLOR_INACTIVE);
-    sprintf(buf, "%4d", m);
+    snprintf(buf, 5, "%4d", m);
     lcd_print(buf, SMLFONT_PX_X(9), FFTHIST_TXT(1));
-    sprintf(buf, "%4d", (int)(m*FFT_RES));
+    snprintf(buf, 5, "%4d", (int)(m*FFT_RES));
     lcd_print(buf, SMLFONT_PX_X(14), FFTHIST_TXT(1));
 
     if (bl != fft_lastbl) {
