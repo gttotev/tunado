@@ -56,17 +56,40 @@ void draw_erase_mainmenu(int pos) {
     );
 }
 
-static int fft_hists[FFT_SIZE/2];
+#define FFTHIST_SIZE 255
+#define FFTHIST_Y(i) ((i) + (LCD_Y_SIZE-FFTHIST_SIZE)/2)
+static float fft_mag[FFT_SIZE];
+static int fft_hists[FFTHIST_SIZE];
 void draw_ffthist(float complex *a) {
-    int i, x, m = fft_max(a, FFT_SIZE);
-    float scale = 1.0f / cabsf(a[m]);
-    lcd_setColor(COLOR_INACTIVE);
-    for (i = 1; i < FFT_SIZE/2; i += 2) {
-        x = cabsf(a[i]) * scale * LCD_X_SIZE;
-        lcd_rect(0, 32 + i/2, x, 1);
+    int i, x, bl, bh, m = fft_max(a, FFT_SIZE, fft_mag);
+    float scale = 1 / sqrtf(fft_mag[m]);
+
+    bl = m - FFTHIST_SIZE/2;
+    if (bl < 1) bl = 1;
+    bh = bl + FFTHIST_SIZE;
+    if (bh > FFT_SIZE/2) {
+        bh = FFT_SIZE/2;
+        bl = bh - FFTHIST_SIZE;
+    }
+
+    for (i = 0; i < FFTHIST_SIZE; ++i) {
+        x = sqrtf(fft_mag[bl+i]) * scale * LCD_X_SIZE;
+        if (x == fft_hists[i]) continue;
+        if (x > fft_hists[i]) {
+            lcd_setColor(COLOR_INACTIVE);
+            lcd_rect(fft_hists[i], FFTHIST_Y(i), x-fft_hists[i], 1);
+        } else {
+            lcd_setColor(COLOR_BG);
+            lcd_rect(x, FFTHIST_Y(i), fft_hists[i]-x, 1);
+        }
+        fft_hists[i] = x;
     }
 }
 void draw_erase_ffthist() {
     int i;
-    for (i = 1; i < FFT_SIZE/2; ++i) fft_hists[i] = 0;
+    lcd_setColor(COLOR_BG);
+    for (i = 0; i < FFTHIST_SIZE; ++i) {
+        lcd_rect(0, FFTHIST_Y(i), fft_hists[i], 1);
+        fft_hists[i] = 0;
+    }
 }
