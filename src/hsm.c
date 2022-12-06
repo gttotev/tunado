@@ -18,10 +18,10 @@ static QState tuner_initial(struct TunerHSM *me) {
 static QState tuner_mainmenu(struct TunerHSM *me) {
     switch (Q_SIG(me)) {
     case Q_ENTRY_SIG:
-        draw_init_mainmenu(me->menu);
+        draw_mainmenu_init(me->menu);
         return Q_HANDLED();
     case Q_EXIT_SIG:
-        draw_erase_mainmenu(me->menu);
+        draw_mainmenu_erase(me->menu);
         return Q_HANDLED();
     case SIG_BTN_DN:
     case SIG_ENC_UP:
@@ -46,10 +46,11 @@ static QState tuner_ffthist(struct TunerHSM *me) {
     switch (Q_SIG(me)) {
     case Q_ENTRY_SIG:
         me->fft_on = 1;
+        draw_ffthist_init();
         return Q_HANDLED();
     case Q_EXIT_SIG:
         me->fft_on = 0;
-        draw_erase_ffthist();
+        draw_ffthist_erase();
         return Q_HANDLED();
     case SIG_FFT_DONE:
         draw_ffthist(me->fft_a);

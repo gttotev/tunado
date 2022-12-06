@@ -34,11 +34,13 @@ void bsp_timerDisarm();
 
 void lcd_init();
 void draw_bg();
-void draw_init_mainmenu(int pos);
-void draw_erase_mainmenu(int pos);
+
+void draw_mainmenu_init(int pos);
+void draw_mainmenu_erase(int pos);
 int draw_mainmenu(int pos, int delta);
 
+void draw_ffthist_init();
+void draw_ffthist_erase();
 void draw_ffthist(float complex *a);
-void draw_erase_ffthist();
 
 #endif
