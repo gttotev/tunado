@@ -5,6 +5,7 @@
 #include <xparameters.h>
 
 #include "ui.h"
+#include "sample.h"
 
 #define POST(sig) QActive_postISR((QActive *)&tuner_ao, sig)
 
@@ -100,10 +101,16 @@ static void interrupt_btn() {
 	case 8:
 		POST(SIG_BTN_DN);
 		break;
+	case 16:
+		POST(SIG_BTN_CT);
+		break;
 	}
 }
 
 void bsp_init(void) {
+	fft_init();
+
+	// Intc
 	XIntc_Initialize(&intc, XPAR_INTC_0_DEVICE_ID);
 	microblaze_register_handler(
 		XIntc_DeviceInterruptHandler, XPAR_INTC_0_DEVICE_ID

@@ -11,10 +11,13 @@ enum TunerSig {
     SIG_BTN_DN,
     SIG_BTN_LF,
     SIG_BTN_RG,
+    SIG_BTN_CT,
+    SIG_FFT_DONE,
 };
 
 struct TunerHSM {
     QActive super;
+    int menu;
 };
 
 extern struct TunerHSM tuner_ao;
@@ -22,6 +25,8 @@ extern struct TunerHSM tuner_ao;
 void hsm_init();
 
 void bsp_init();
+void bsp_timerArm();
+void bsp_timerDisarm();
 
 void lcd_init();
 
