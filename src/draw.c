@@ -250,12 +250,14 @@ static char *note_find(float f, int a4, int *octave, float *fcents) {
 }
 
 void draw_tuner(float complex *a, int a4) {
-	int octave;
 	char buf[5] = " ", *note = "  ";
-	float fcents = 0, freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
+	int octave, m = fft_max(a, FFT_SIZE, fft_mag);
+	float fcents = 0, freq = fft_fit(m, fft_mag, FFT_RES);
 	if (freq > 64) {
 		note = note_find(freq, a4, &octave, &fcents);
 		buf[0] = '0' + octave;
+	} else {
+		freq = 0;
 	}
 
 	lcd_setColor(COLOR_BG);

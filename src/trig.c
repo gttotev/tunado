@@ -47,5 +47,5 @@ float tcos(float x) {
 			power*=-1;
 		cosine+=power/factorial(2*i);
 	}
-	return cosine;	
+	return cosine;
 }

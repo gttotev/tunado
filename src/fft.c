@@ -64,6 +64,12 @@ int fft_max(float complex *a, int n, float *mag) {
 			m = i;
 		}
 	}
-	// TODO: parabolic curve fitting?
 	return m;
+}
+
+float fft_fit(int i, float *mag, float s) {
+	float y1 = mag[i-1], y2 = mag[i], y3 = mag[i+1];
+	float x0 = (2*s*(y2-y1)) / (s*(2*y2-y1-y3));
+	if (x0 < 0 || x0 > 2) return 0;
+	return s*(i + x0 - 1);
 }

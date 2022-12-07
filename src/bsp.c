@@ -35,7 +35,8 @@ void bsp_timerArm() {
 }
 
 void bsp_timerDisarm() {
-	XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
+	// XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
+	XGpio_DiscreteSet(&led, GPIO_CH, 1<<14);
 }
 
 void interrupt_tmr(void *_, u8 tmr_num) {

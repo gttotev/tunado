@@ -22,6 +22,7 @@ u32 grab_read(u32 index);
 void fft_init();
 void rufft(float complex *a, int n);
 int fft_max(float complex *a, int n, float *mag);
+float fft_fit(int i, float *mag, float s);
 
 float tsin(float x);
 float tcos(float x);

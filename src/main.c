@@ -17,6 +17,8 @@ void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
 	(void)file;
 	(void)line;
 	QF_INT_LOCK();
+	// TODO: stopping?
+	bsp_timerDisarm();
 	while (1);
 }
 
