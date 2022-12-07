@@ -88,11 +88,9 @@ static QState tuner_a4tuner(struct TunerHSM *me) {
         return Q_HANDLED();
     case SIG_ENC_DN:
         if (me->a4 > 420) --me->a4;
-        draw_a4tuner(me->a4);
         return Q_TRAN(tuner_a4);
     case SIG_ENC_UP:
         if (me->a4 < 460) ++me->a4;
-        draw_a4tuner(me->a4);
         return Q_TRAN(tuner_a4);
     }
     return Q_SUPER(tuner_fft);
@@ -120,6 +118,9 @@ static QState tuner_a4(struct TunerHSM *me) {
         return Q_HANDLED();
     case Q_TIMEOUT_SIG:
         return Q_TRAN(tuner_tuner);
+    case SIG_FFT_DONE:  // TODO: remove this hack?
+        draw_a4tuner(me->a4);
+        return Q_HANDLED();
     }
     return Q_SUPER(tuner_a4tuner);
 }

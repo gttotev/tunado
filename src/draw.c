@@ -155,7 +155,6 @@ void draw_ffthist_erase() {
 #define TUNER_BAR_X (LCD_X_SIZE/2)
 #define TUNER_BAR_Y (TUNER_NOTE_Y*2)
 #define TUNER_BAR_H 16
-#define TUNER_BAR_PX(c) ((int)((LCD_X_SIZE/100.0f)*c))
 #define TUNER_CENTS_X TUNER_NOTE_X
 #define TUNER_CENTS_Y (TUNER_NOTE_Y*3)
 static int tuner_bar;
@@ -210,8 +209,8 @@ void draw_a4tuner_erase() {
     tuner_bar = 0;
 }
 
-static void bar_adjust(int bar) {
-    int a, b;
+static void bar_adjust(float c) {
+    int a, b, bar = c * LCD_X_SIZE;
     if (bar == tuner_bar) return;
 
     a = MIN(TUNER_BAR_X, bar + TUNER_BAR_X);
@@ -242,20 +241,20 @@ static char *notes[] = {
     "F#", "G ", "G#", "A ", "A#", "B ",
 };
 
-static char *note_find(float f, int a4, int *octave, int *cents) {
+static char *note_find(float f, int a4, int *octave, float *fcents) {
     float nf = 12 * log2f(f/a4) + 57;
     int n = roundf(nf);
     *octave = n / 12;
-    *cents = (nf - n) * 100;
+    *fcents = nf - n;
     return notes[n % 12];
 }
 
 void draw_tuner(float complex *a, int a4) {
-    int octave, cents = 0;
+    int octave;
     char buf[5] = " ", *note = "  ";
-    float freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
+    float fcents = 0, freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
     if (freq > 64) {
-        note = note_find(freq, a4, &octave, &cents);
+        note = note_find(freq, a4, &octave, &fcents);
         buf[0] = '0' + octave;
     }
 
@@ -268,7 +267,7 @@ void draw_tuner(float complex *a, int a4) {
     lcd_print(buf, TUNER_NOTE_X+BIGFONT_PX(2), TUNER_NOTE_Y);
 
     // Cents
-    snprintf(buf, 5, "%3d", cents);
+    snprintf(buf, 5, "%3d", (int)(100*fcents));
     lcd_print(buf, TUNER_CENTS_X, TUNER_CENTS_Y);
 
     // Hz
@@ -276,7 +275,7 @@ void draw_tuner(float complex *a, int a4) {
     snprintf(buf, 5, "%04d", (int)freq);
     lcd_print(buf, TUNER_HZ_X, TUNER_HZ_Y);
 
-    bar_adjust(TUNER_BAR_PX(cents));
+    bar_adjust(fcents);
 }
 
 void draw_a4tuner(int a4) {
@@ -293,5 +292,5 @@ void draw_a4tuner(int a4) {
     snprintf(buf, 5, "%04d", a4);
     lcd_print(buf, TUNER_HZ_X, TUNER_HZ_Y);
 
-    bar_adjust(((a4 - 440) * 5) / 2);  // 420 - 460
+    bar_adjust((a4 - 440) / 40.f);  // 420 - 460
 }
