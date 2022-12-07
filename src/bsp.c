@@ -18,7 +18,7 @@
 #define TMR_BLANK_NUM 0
 #define TMR_BLANK_RST -200000000	// 2 s
 #define TMR_DEBTN_NUM 1
-#define TMR_DEBTN_RST -10000000		// 100 ms
+#define TMR_DEBTN_RST -2000000		// 20 ms
 #define TMR_INTR \
 	XPAR_MICROBLAZE_0_AXI_INTC_AXI_TIMER_0_INTERRUPT_INTR
 
@@ -27,8 +27,8 @@ XIntc intc;
 XGpio enc, btn, led, dc;
 XTmrCtr tmr;
 
-static int btn_state = 0, btn_enabled = 1;
 static int enc_state = 3, enc_dir = 0;
+static int btn_enabled = 1, btn_state = 0, ecl_state = 0;
 
 void bsp_timerArm() {
 	XTmrCtr_Start(&tmr, TMR_BLANK_NUM);
@@ -57,12 +57,12 @@ static void interrupt_enc() {
 	pins = XGpio_DiscreteRead(&enc, GPIO_CH);
 
 	new_state = pins & 4;
-	if (new_state != btn_state && btn_enabled) {
+	if (new_state != ecl_state && btn_enabled) {
 		btn_enabled = 0;
 		XTmrCtr_Start(&tmr, TMR_DEBTN_NUM);
 		if (new_state) POST(SIG_ENC_CL);
 	}
-	btn_state = new_state;
+	ecl_state = new_state;
 
 	new_state = pins & 3;
 	switch (new_state) {
@@ -82,12 +82,17 @@ static void interrupt_enc() {
 }
 
 static void interrupt_btn() {
+	int state;
 	XGpio_InterruptClear(&btn, XGPIO_IR_CH1_MASK);
-	// TODO: debounce better, somehow
+
+	state = XGpio_DiscreteRead(&btn, GPIO_CH);
+	if (state == btn_state) return;
+	btn_state = state;
 	if (!btn_enabled) return;
+
 	btn_enabled = 0;
 	XTmrCtr_Start(&tmr, TMR_DEBTN_NUM);
-	switch (XGpio_DiscreteRead(&btn, GPIO_CH)) {
+	switch (state) {
 	case 1:
 		POST(SIG_BTN_UP);
 		break;
