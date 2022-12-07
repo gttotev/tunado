@@ -22,6 +22,8 @@ struct TunerHSM {
 
     int fft_on;
     float complex fft_a[FFT_SIZE];
+
+    int a4;
 };
 
 extern struct TunerHSM tuner_ao;
@@ -42,5 +44,9 @@ int draw_mainmenu(int pos, int delta);
 void draw_ffthist_init();
 void draw_ffthist_erase();
 void draw_ffthist(float complex *a);
+
+void draw_tuner_init();
+void draw_tuner_erase();
+void draw_tuner(float complex *a);
 
 #endif
