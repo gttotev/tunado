@@ -189,6 +189,11 @@ void draw_a4tuner_init() {
 		"Hz", TUNER_HZ_X + SVNFONT_PX_X(3)/2,
 		TUNER_HZ_Y + SVNFONT_PX_Y(1)
 	);
+	lcd_setColor(COLOR_INACTIVE);
+	lcd_rect(
+		TUNER_BAR_X, TUNER_NOTE_Y+BIGFONT_PX(1),
+		1, TUNER_CENTS_Y - (TUNER_NOTE_Y+BIGFONT_PX(1))
+	);
 }
 
 void draw_a4tuner_erase() {
@@ -196,6 +201,10 @@ void draw_a4tuner_erase() {
 	lcd_rect(
 		TUNER_HZ_X, TUNER_HZ_Y,
 		SVNFONT_PX_X(4), SVNFONT_PX_Y(1)+BIGFONT_PX(1)
+	);
+	lcd_rect(
+		TUNER_BAR_X, TUNER_NOTE_Y+BIGFONT_PX(1),
+		1, TUNER_CENTS_Y - (TUNER_NOTE_Y+BIGFONT_PX(1))
 	);
 	// TODO: optimize A4 states
 	lcd_rect(
@@ -223,8 +232,8 @@ static void bar_adjust(float c) {
 		lcd_rect(a, TUNER_BAR_Y, b-a, TUNER_BAR_H);
 	}
 
-	a = MAX(TUNER_BAR_X, bar + TUNER_BAR_X);
-	b = MAX(TUNER_BAR_X, tuner_bar + TUNER_BAR_X);
+	a = MAX(TUNER_BAR_X+1, bar + TUNER_BAR_X);
+	b = MAX(TUNER_BAR_X+1, tuner_bar + TUNER_BAR_X);
 	if (a > b) {
 		lcd_setColor(COLOR_ACTIVE);
 		lcd_rect(b, TUNER_BAR_Y, a-b, TUNER_BAR_H);
@@ -269,7 +278,7 @@ void draw_tuner(float complex *a, int a4) {
 	lcd_print(buf, TUNER_NOTE_X+BIGFONT_PX(2), TUNER_NOTE_Y);
 
 	// Cents
-	snprintf(buf, 5, "%3d", (int)(100*fcents));
+	snprintf(buf, 5, "%+03d", (int)(100*fcents));
 	lcd_print(buf, TUNER_CENTS_X, TUNER_CENTS_Y);
 
 	// Hz
