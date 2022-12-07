@@ -48,6 +48,9 @@ void draw_ffthist(float complex *a);
 void draw_tuner_init();
 void draw_tuner_erase();
 void draw_tuner(float complex *a, int a4);
-void draw_tuner_a4(int a4);
+
+void draw_a4tuner_init();
+void draw_a4tuner_erase();
+void draw_a4tuner(int a4);
 
 #endif

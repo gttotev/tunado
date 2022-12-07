@@ -149,16 +149,40 @@ void draw_ffthist_erase() {
 }
 
 #define TUNER_HZ_X ((LCD_X_SIZE - SVNFONT_PX_X(4))/2)
-#define TUNER_HZ_Y 256
-#define TUNER_NOTE_X ((LCD_X_SIZE - BIGFONT_PX(2))/2)
+#define TUNER_HZ_Y 254
+#define TUNER_NOTE_X ((LCD_X_SIZE - BIGFONT_PX(3))/2)
 #define TUNER_NOTE_Y 64
 #define TUNER_BAR_X (LCD_X_SIZE/2)
-#define TUNER_BAR_Y (LCD_Y_SIZE/2)
+#define TUNER_BAR_Y (TUNER_NOTE_Y*2)
 #define TUNER_BAR_H 16
 #define TUNER_BAR_PX(c) ((int)((LCD_X_SIZE/100.0f)*c))
+#define TUNER_CENTS_X TUNER_NOTE_X
+#define TUNER_CENTS_Y (TUNER_NOTE_Y*3)
 static int tuner_bar;
 
 void draw_tuner_init() {
+    lcd_setFont(BigFont);
+    lcd_setColor(COLOR_BG);
+    lcd_setColorBg(COLOR_INACTIVE);
+    lcd_print(
+        "cents", TUNER_CENTS_X-BIGFONT_PX(1),
+        TUNER_CENTS_Y+BIGFONT_PX(1)
+    );
+    lcd_rect(
+        TUNER_NOTE_X, TUNER_NOTE_Y-BIGFONT_PX(1),
+        BIGFONT_PX(3), BIGFONT_PX(1)
+    );
+}
+
+void draw_tuner_erase() {
+    lcd_setColor(COLOR_BG);
+    lcd_rect(
+        TUNER_CENTS_X-BIGFONT_PX(1), TUNER_CENTS_Y,
+        BIGFONT_PX(5), BIGFONT_PX(2)
+    );
+}
+
+void draw_a4tuner_init() {
     lcd_setFont(BigFont);
     lcd_setColor(COLOR_BG);
     lcd_setColorBg(COLOR_INACTIVE);
@@ -168,15 +192,16 @@ void draw_tuner_init() {
     );
 }
 
-void draw_tuner_erase() {
+void draw_a4tuner_erase() {
     lcd_setColor(COLOR_BG);
     lcd_rect(
         TUNER_HZ_X, TUNER_HZ_Y,
         SVNFONT_PX_X(4), SVNFONT_PX_Y(1)+BIGFONT_PX(1)
     );
+    // TODO: optimize A4 states
     lcd_rect(
-        TUNER_NOTE_X, TUNER_NOTE_Y,
-        BIGFONT_PX(3), BIGFONT_PX(1)
+        TUNER_NOTE_X, TUNER_NOTE_Y-BIGFONT_PX(1),
+        BIGFONT_PX(3), BIGFONT_PX(2)
     );
     lcd_rect(
         MIN(TUNER_BAR_X, tuner_bar + TUNER_BAR_X), TUNER_BAR_Y,
@@ -242,6 +267,10 @@ void draw_tuner(float complex *a, int a4) {
     lcd_print(note, TUNER_NOTE_X, TUNER_NOTE_Y);
     lcd_print(buf, TUNER_NOTE_X+BIGFONT_PX(2), TUNER_NOTE_Y);
 
+    // Cents
+    snprintf(buf, 5, "%3d", cents);
+    lcd_print(buf, TUNER_CENTS_X, TUNER_CENTS_Y);
+
     // Hz
     lcd_setFont(SevenSegNumFont);
     snprintf(buf, 5, "%04d", (int)freq);
@@ -250,14 +279,14 @@ void draw_tuner(float complex *a, int a4) {
     bar_adjust(TUNER_BAR_PX(cents));
 }
 
-void draw_tuner_a4(int a4) {
+void draw_a4tuner(int a4) {
     char buf[5];
 
     lcd_setColor(COLOR_BG);
     lcd_setColorBg(COLOR_INACTIVE);
 
-    // Note (needs buf)
     lcd_setFont(BigFont);
+    lcd_print("Set", TUNER_NOTE_X, TUNER_NOTE_Y-BIGFONT_PX(1));
     lcd_print("A 4", TUNER_NOTE_X, TUNER_NOTE_Y);
 
     lcd_setFont(SevenSegNumFont);

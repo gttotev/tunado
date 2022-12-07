@@ -81,18 +81,18 @@ static QState tuner_ffthist(struct TunerHSM *me) {
 static QState tuner_a4tuner(struct TunerHSM *me) {
     switch (Q_SIG(me)) {
     case Q_ENTRY_SIG:
-        draw_tuner_init();
+        draw_a4tuner_init();
         return Q_HANDLED();
     case Q_EXIT_SIG:
-        draw_tuner_erase();
+        draw_a4tuner_erase();
         return Q_HANDLED();
     case SIG_ENC_DN:
         if (me->a4 > 420) --me->a4;
-        draw_tuner_a4(me->a4);
+        draw_a4tuner(me->a4);
         return Q_TRAN(tuner_a4);
     case SIG_ENC_UP:
         if (me->a4 < 460) ++me->a4;
-        draw_tuner_a4(me->a4);
+        draw_a4tuner(me->a4);
         return Q_TRAN(tuner_a4);
     }
     return Q_SUPER(tuner_fft);
@@ -100,6 +100,12 @@ static QState tuner_a4tuner(struct TunerHSM *me) {
 
 static QState tuner_tuner(struct TunerHSM *me) {
     switch (Q_SIG(me)) {
+    case Q_ENTRY_SIG:
+        draw_tuner_init();
+        return Q_HANDLED();
+    case Q_EXIT_SIG:
+        draw_tuner_erase();
+        return Q_HANDLED();
     case SIG_FFT_DONE:
         draw_tuner(me->fft_a, me->a4);
         return Q_HANDLED();
@@ -111,9 +117,6 @@ static QState tuner_a4(struct TunerHSM *me) {
     switch (Q_SIG(me)) {
     case Q_ENTRY_SIG:
         bsp_timerArm();
-        return Q_HANDLED();
-    case Q_EXIT_SIG:
-        bsp_timerDisarm();
         return Q_HANDLED();
     case Q_TIMEOUT_SIG:
         return Q_TRAN(tuner_tuner);

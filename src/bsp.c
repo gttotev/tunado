@@ -36,8 +36,6 @@ void bsp_timerArm() {
 
 void bsp_timerDisarm() {
 	XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
-	// TODO: check if still works
-	// XTmrCtr_Reset(&tmr, TMR_BLANK_NUM);
 }
 
 void interrupt_tmr(void *_, u8 tmr_num) {
