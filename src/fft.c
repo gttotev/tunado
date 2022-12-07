@@ -53,9 +53,9 @@ void rufft(float complex *a, int n) {
 
 int fft_max(float complex *a, int n, float *mag) {
     int i, m, lim = n >> 1;
-    float max, re, im;
+    float re, im, max = 0;
 
-    for (max = 0, i = 1; i < lim; ++i) {
+    for (i = 1; i < lim; ++i) {
         re = crealf(a[i]);
         im = cimagf(a[i]);
         mag[i] = re*re + im*im;

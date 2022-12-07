@@ -150,6 +150,8 @@ void draw_ffthist_erase() {
 
 #define TUNER_HZ_X ((LCD_X_SIZE - SVNFONT_PX_X(4))/2)
 #define TUNER_HZ_Y 256
+#define TUNER_NOTE_X ((LCD_X_SIZE - BIGFONT_PX(2))/2)
+#define TUNER_NOTE_Y 64
 #define TUNER_BAR_X (LCD_X_SIZE/2)
 #define TUNER_BAR_Y (LCD_Y_SIZE/2)
 #define TUNER_BAR_H 16
@@ -171,6 +173,10 @@ void draw_tuner_erase() {
     lcd_rect(
         TUNER_HZ_X, TUNER_HZ_Y,
         SVNFONT_PX_X(4), SVNFONT_PX_Y(1)+BIGFONT_PX(1)
+    );
+    lcd_rect(
+        TUNER_NOTE_X, TUNER_NOTE_Y,
+        BIGFONT_PX(3), BIGFONT_PX(1)
     );
     lcd_rect(
         MIN(TUNER_BAR_X, tuner_bar + TUNER_BAR_X), TUNER_BAR_Y,
@@ -200,19 +206,44 @@ static void adjust_bar(int bar) {
     }
 }
 
-void draw_tuner(float complex *a) {
-    char buf[5];
-    int bar, freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
+static char *notes[] = {
+    "C ", "C#", "D ", "D#", "E ", "F ",
+    "F#", "G ", "G#", "A ", "A#", "B ",
+};
 
-    bar = TUNER_BAR_PX(CLAMP(freq - 440, -50, 50));
-    if (bar != tuner_bar) {
-        adjust_bar(bar);
-        tuner_bar = bar;
+static char *note_find(float f, int a4, int *octave, int *cents) {
+    float nf = 12 * log2f(f/a4) + 57;
+    int n = roundf(nf);
+    *octave = n / 12;
+    *cents = (nf - n) * 100;
+    return notes[n % 12];
+}
+
+void draw_tuner(float complex *a, int a4) {
+    char buf[5] = " ", *note = "  ";
+    int bar, octave, cents = 0;
+    float freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
+    if (freq > 64) {
+        note = note_find(freq, a4, &octave, &cents);
+        buf[0] = '0' + octave;
     }
 
     lcd_setColor(COLOR_BG);
     lcd_setColorBg(COLOR_INACTIVE);
+
+    // Note
+    lcd_setFont(BigFont);
+    lcd_print(note, TUNER_NOTE_X, TUNER_NOTE_Y);
+    lcd_print(buf, TUNER_NOTE_X+BIGFONT_PX(2), TUNER_NOTE_Y);
+
+    // Hz
     lcd_setFont(SevenSegNumFont);
-    snprintf(buf, 5, "%04d", freq);
+    snprintf(buf, 5, "%04d", (int)freq);
     lcd_print(buf, TUNER_HZ_X, TUNER_HZ_Y);
+
+    bar = TUNER_BAR_PX(cents);
+    if (bar != tuner_bar) {
+        adjust_bar(bar);
+        tuner_bar = bar;
+    }
 }

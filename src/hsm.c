@@ -85,7 +85,7 @@ static QState tuner_tuner(struct TunerHSM *me) {
         draw_tuner_erase();
         return Q_HANDLED();
     case SIG_FFT_DONE:
-        draw_tuner(me->fft_a);
+        draw_tuner(me->fft_a, me->a4);
         return Q_HANDLED();
     }
     return Q_SUPER(tuner_fft);

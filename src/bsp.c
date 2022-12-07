@@ -86,9 +86,9 @@ static void interrupt_enc() {
 static void interrupt_btn() {
 	XGpio_InterruptClear(&btn, XGPIO_IR_CH1_MASK);
 	// TODO: debounce better, somehow
-	// if (!btn_enabled) return;
-	// btn_enabled = 0;
-	// XTmrCtr_Start(&tmr, TMR_DEBTN_NUM);
+	if (!btn_enabled) return;
+	btn_enabled = 0;
+	XTmrCtr_Start(&tmr, TMR_DEBTN_NUM);
 	switch (XGpio_DiscreteRead(&btn, GPIO_CH)) {
 	case 1:
 		POST(SIG_BTN_UP);
@@ -179,7 +179,7 @@ static void sample(float complex *a) {
 
 void QF_onIdle(void) {        /* entered with interrupts locked */
     QF_INT_UNLOCK();                       /* unlock interrupts */
-	// TODO: test nested interrupts, posting from here
+	// TODO: test nested interrupts, posting from here, stopping?
 	if (tuner_ao.fft_on) {
 		if (tuner_ao.fft_on == 1) {  // just turned on
 			tuner_ao.fft_on = 2;
