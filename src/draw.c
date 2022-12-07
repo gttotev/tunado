@@ -185,9 +185,12 @@ void draw_tuner_erase() {
     tuner_bar = 0;
 }
 
-static void adjust_bar(int bar) {
-    int a = MIN(TUNER_BAR_X, bar + TUNER_BAR_X);
-    int b = MIN(TUNER_BAR_X, tuner_bar + TUNER_BAR_X);
+static void bar_adjust(int bar) {
+    int a, b;
+    if (bar == tuner_bar) return;
+
+    a = MIN(TUNER_BAR_X, bar + TUNER_BAR_X);
+    b = MIN(TUNER_BAR_X, tuner_bar + TUNER_BAR_X);
     if (a > b) {
         lcd_setColor(COLOR_BG);
         lcd_rect(b, TUNER_BAR_Y, a-b, TUNER_BAR_H);
@@ -195,6 +198,7 @@ static void adjust_bar(int bar) {
         lcd_setColor(COLOR_ACTIVE);
         lcd_rect(a, TUNER_BAR_Y, b-a, TUNER_BAR_H);
     }
+
     a = MAX(TUNER_BAR_X, bar + TUNER_BAR_X);
     b = MAX(TUNER_BAR_X, tuner_bar + TUNER_BAR_X);
     if (a > b) {
@@ -204,6 +208,8 @@ static void adjust_bar(int bar) {
         lcd_setColor(COLOR_BG);
         lcd_rect(a, TUNER_BAR_Y, b-a, TUNER_BAR_H);
     }
+
+    tuner_bar = bar;
 }
 
 static char *notes[] = {
@@ -220,8 +226,8 @@ static char *note_find(float f, int a4, int *octave, int *cents) {
 }
 
 void draw_tuner(float complex *a, int a4) {
+    int octave, cents = 0;
     char buf[5] = " ", *note = "  ";
-    int bar, octave, cents = 0;
     float freq = fft_max(a, FFT_SIZE, fft_mag) * FFT_RES;
     if (freq > 64) {
         note = note_find(freq, a4, &octave, &cents);
@@ -231,7 +237,7 @@ void draw_tuner(float complex *a, int a4) {
     lcd_setColor(COLOR_BG);
     lcd_setColorBg(COLOR_INACTIVE);
 
-    // Note
+    // Note (needs buf)
     lcd_setFont(BigFont);
     lcd_print(note, TUNER_NOTE_X, TUNER_NOTE_Y);
     lcd_print(buf, TUNER_NOTE_X+BIGFONT_PX(2), TUNER_NOTE_Y);
@@ -241,9 +247,22 @@ void draw_tuner(float complex *a, int a4) {
     snprintf(buf, 5, "%04d", (int)freq);
     lcd_print(buf, TUNER_HZ_X, TUNER_HZ_Y);
 
-    bar = TUNER_BAR_PX(cents);
-    if (bar != tuner_bar) {
-        adjust_bar(bar);
-        tuner_bar = bar;
-    }
+    bar_adjust(TUNER_BAR_PX(cents));
+}
+
+void draw_tuner_a4(int a4) {
+    char buf[5];
+
+    lcd_setColor(COLOR_BG);
+    lcd_setColorBg(COLOR_INACTIVE);
+
+    // Note (needs buf)
+    lcd_setFont(BigFont);
+    lcd_print("A 4", TUNER_NOTE_X, TUNER_NOTE_Y);
+
+    lcd_setFont(SevenSegNumFont);
+    snprintf(buf, 5, "%04d", a4);
+    lcd_print(buf, TUNER_HZ_X, TUNER_HZ_Y);
+
+    bar_adjust(((a4 - 440) * 5) / 2);  // 420 - 460
 }
