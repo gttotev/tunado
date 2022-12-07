@@ -8,9 +8,10 @@
 #define FREQ_SAMPLE (FREQ_CLOCK/2048.0f)
 
 #define GRAB_BITS 12
+#define GRAB_SIZE (1 << GRAB_BITS)
 #define SAMP_FACTOR 2
 #define FFT_SIZE (1 << (GRAB_BITS-SAMP_FACTOR))
-#define FFT_RES (FREQ_SAMPLE / (1 << GRAB_BITS))
+#define FFT_RES (FREQ_SAMPLE / GRAB_SIZE)
 
 #define PI 3.14159265f
 

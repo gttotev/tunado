@@ -173,7 +173,7 @@ static void sample(float complex *a) {
 	for (i = 0; i < FFT_SIZE; ++i) a[i] = 0;
 
 	i = 0;
-	while (i < (1<<GRAB_BITS)) {
+	while (i < GRAB_SIZE) {
 		lim = grab_count();
 		for (; i < lim; ++i) {
 			a[i>>SAMP_FACTOR] += grab_read(i);
@@ -181,19 +181,30 @@ static void sample(float complex *a) {
 	}
 }
 
+#define FFT_AVG 4
+static float complex fft_a[FFT_SIZE];
+
 void QF_onIdle(void) {        /* entered with interrupts locked */
+	int i, j;
 	QF_INT_UNLOCK();                       /* unlock interrupts */
 	// TODO: test nested interrupts, posting from here, stopping?
-	if (tuner_ao.fft_on) {
-		if (tuner_ao.fft_on == 1) {  // just turned on
-			tuner_ao.fft_on = 2;
-			grab_start();
-			grab_wait(1 << GRAB_BITS);
-			grab_start();
-		}
-		sample(tuner_ao.fft_a);
+	if (!tuner_ao.fft_on) return;
+
+	if (tuner_ao.fft_on == 1) {  // just turned on
+		tuner_ao.fft_on = 2;
 		grab_start();
-		rufft(tuner_ao.fft_a, FFT_SIZE);
-		QActive_post((QActive *)&tuner_ao, SIG_FFT_DONE);
+		grab_wait(GRAB_SIZE);
+		grab_start();
 	}
+
+	for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] = 0;
+	for (j = 0; j < FFT_AVG; ++j) {
+		sample(fft_a);
+		grab_start();
+		rufft(fft_a, FFT_SIZE);
+		for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] += fft_a[i];
+	}
+	// for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] /= FFT_AVG;
+
+	QActive_post((QActive *)&tuner_ao, SIG_FFT_DONE);
 }
