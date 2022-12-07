@@ -20,7 +20,6 @@ struct TunerHSM {
 	QActive super;
 	int menu;
 
-	int fft_on;
 	float complex fft_a[FFT_SIZE];
 
 	int a4;

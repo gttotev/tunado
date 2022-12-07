@@ -166,6 +166,7 @@ void bsp_init(void) {
 void QF_onStartup(void) {
 	XIntc_Start(&intc, XIN_REAL_MODE);
 	microblaze_enable_interrupts();
+	grab_start();
 }
 
 static void sample(float complex *a) {
@@ -175,36 +176,29 @@ static void sample(float complex *a) {
 	i = 0;
 	while (i < GRAB_SIZE) {
 		lim = grab_count();
-		for (; i < lim; ++i) {
-			a[i>>SAMP_FACTOR] += grab_read(i);
-		}
+		for (; i < lim; ++i) a[i>>SAMP_FACTOR] += grab_read(i);
 	}
 }
 
-#define FFT_AVG 4
-static float complex fft_a[FFT_SIZE];
+// TODO: make adjustable on octave range
+#define FFTAVG_SIZE 2
+static int fai;
+static float complex fft_avg[FFTAVG_SIZE][FFT_SIZE];
 
 void QF_onIdle(void) {        /* entered with interrupts locked */
-	int i, j;
+	int i;
 	QF_INT_UNLOCK();                       /* unlock interrupts */
 	// TODO: test nested interrupts, posting from here, stopping?
-	if (!tuner_ao.fft_on) return;
+	for (i = 0; i < FFT_SIZE; ++i)
+		tuner_ao.fft_a[i] -= fft_avg[fai][i];
 
-	if (tuner_ao.fft_on == 1) {  // just turned on
-		tuner_ao.fft_on = 2;
-		grab_start();
-		grab_wait(GRAB_SIZE);
-		grab_start();
-	}
+	sample(fft_avg[fai]);
+	grab_start();
+	rufft(fft_avg[fai], FFT_SIZE);
 
-	for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] = 0;
-	for (j = 0; j < FFT_AVG; ++j) {
-		sample(fft_a);
-		grab_start();
-		rufft(fft_a, FFT_SIZE);
-		for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] += fft_a[i];
-	}
-	// for (i = 0; i < FFT_SIZE; ++i) tuner_ao.fft_a[i] /= FFT_AVG;
+	for (i = 0; i < FFT_SIZE; ++i)
+		tuner_ao.fft_a[i] += fft_avg[fai][i];
+	fai = (fai + 1) % FFTAVG_SIZE;
 
 	QActive_post((QActive *)&tuner_ao, SIG_FFT_DONE);
 }

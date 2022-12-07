@@ -51,12 +51,6 @@ static QState tuner_mainmenu(struct TunerHSM *me) {
 
 static QState tuner_fft(struct TunerHSM *me) {
 	switch (Q_SIG(me)) {
-	case Q_ENTRY_SIG:
-		me->fft_on = 1;
-		return Q_HANDLED();
-	case Q_EXIT_SIG:
-		me->fft_on = 0;
-		return Q_HANDLED();
 	case SIG_BTN_LF:
 		return Q_TRAN(tuner_mainmenu);
 	}
