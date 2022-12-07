@@ -7,14 +7,14 @@
 #define LCD_Y_SIZE     320
 
 #define LCD_COLOR(r, g, b) \
-    ((r & 0x0F8) | g >> 5), ((g & 0x1C) << 3 | b >> 3)
+	((r & 0x0F8) | g >> 5), ((g & 0x1C) << 3 | b >> 3)
 #define LCD_COLORS(x) LCD_COLOR(x)
 
 extern u8 SmallFont[];
 extern u8 BigFont[];
 extern u8 SevenSegNumFont[];
 
-void LCD_Write_COM(char VL);  
+void LCD_Write_COM(char VL);
 void LCD_Write_DATA(char VL);
 void LCD_Write_DATA16(char VH, char VL);
 

@@ -5,25 +5,25 @@
 #include "qpn_port.h"
 
 enum TunerSig {
-    SIG_ENC_UP = Q_USER_SIG,
-    SIG_ENC_DN,
-    SIG_ENC_CL,
-    SIG_BTN_UP, 
-    SIG_BTN_DN,
-    SIG_BTN_LF,
-    SIG_BTN_RG,
-    SIG_BTN_CT,
-    SIG_FFT_DONE,
+	SIG_ENC_UP = Q_USER_SIG,
+	SIG_ENC_DN,
+	SIG_ENC_CL,
+	SIG_BTN_UP,
+	SIG_BTN_DN,
+	SIG_BTN_LF,
+	SIG_BTN_RG,
+	SIG_BTN_CT,
+	SIG_FFT_DONE,
 };
 
 struct TunerHSM {
-    QActive super;
-    int menu;
+	QActive super;
+	int menu;
 
-    int fft_on;
-    float complex fft_a[FFT_SIZE];
+	int fft_on;
+	float complex fft_a[FFT_SIZE];
 
-    int a4;
+	int a4;
 };
 
 extern struct TunerHSM tuner_ao;

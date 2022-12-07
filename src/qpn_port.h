@@ -15,7 +15,7 @@
 #define Q_ROM_VAR
 #define Q_ROM_PTR(rom_var_)     rom_var_
 #define Q_ROM_BYTE(rom_var_)    rom_var_
-                                  
+
 #define Q_REENTRANT
 #define Q_PARAM_SIZE            0
 

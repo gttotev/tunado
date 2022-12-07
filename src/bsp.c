@@ -168,20 +168,20 @@ void QF_onStartup(void) {
 }
 
 static void sample(float complex *a) {
-    int i, lim;
-    for (i = 0; i < FFT_SIZE; ++i) a[i] = 0;
+	int i, lim;
+	for (i = 0; i < FFT_SIZE; ++i) a[i] = 0;
 
 	i = 0;
-    while (i < (1<<GRAB_BITS)) {
-        lim = grab_count();
-        for (; i < lim; ++i) {
-            a[i>>SAMP_FACTOR] += grab_read(i);
-        }
-    }
+	while (i < (1<<GRAB_BITS)) {
+		lim = grab_count();
+		for (; i < lim; ++i) {
+			a[i>>SAMP_FACTOR] += grab_read(i);
+		}
+	}
 }
 
 void QF_onIdle(void) {        /* entered with interrupts locked */
-    QF_INT_UNLOCK();                       /* unlock interrupts */
+	QF_INT_UNLOCK();                       /* unlock interrupts */
 	// TODO: test nested interrupts, posting from here, stopping?
 	if (tuner_ao.fft_on) {
 		if (tuner_ao.fft_on == 1) {  // just turned on
