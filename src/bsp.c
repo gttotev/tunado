@@ -35,8 +35,7 @@ void bsp_timerArm() {
 }
 
 void bsp_timerDisarm() {
-	// XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
-	XGpio_DiscreteSet(&led, GPIO_CH, 1<<14);
+	XTmrCtr_Stop(&tmr, TMR_BLANK_NUM);
 }
 
 void interrupt_tmr(void *_, u8 tmr_num) {
@@ -187,7 +186,6 @@ static float complex fft_avg[FFTAVG_SIZE][FFT_SIZE];
 void QF_onIdle(void) {        /* entered with interrupts locked */
 	int i;
 	QF_INT_UNLOCK();                       /* unlock interrupts */
-	// TODO: test nested interrupts, posting from here, stopping?
 	for (i = 0; i < FFT_SIZE; ++i) {
 		tuner_ao.fft_a[i] -= fft_avg[fai][i];
 	}
