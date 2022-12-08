@@ -5,6 +5,7 @@ struct TunerHSM tuner_ao;
 static QState tuner_initial(struct TunerHSM *me);
 static QState tuner_mainmenu(struct TunerHSM *me);
 static QState tuner_fft(struct TunerHSM *me);
+static QState tuner_octave(struct TunerHSM *me);
 static QState tuner_ffthist(struct TunerHSM *me);
 static QState tuner_a4tuner(struct TunerHSM *me);
 static QState tuner_tuner(struct TunerHSM *me);
@@ -43,6 +44,8 @@ static QState tuner_mainmenu(struct TunerHSM *me) {
 			return Q_TRAN(tuner_tuner);
 		case 1:
 			return Q_TRAN(tuner_ffthist);
+		case 2:
+			return Q_TRAN(tuner_octave);
 		}
 		return Q_HANDLED();
 	}
@@ -55,6 +58,18 @@ static QState tuner_fft(struct TunerHSM *me) {
 		return Q_TRAN(tuner_mainmenu);
 	}
 	return Q_SUPER(QHsm_top);
+}
+
+static QState tuner_octave(struct TunerHSM *me) {
+	switch (Q_SIG(me)) {
+	case Q_ENTRY_SIG:
+		draw_octave_init();
+		return Q_HANDLED();
+	case Q_EXIT_SIG:
+		draw_octave_erase();
+		return Q_HANDLED();
+	}
+	return Q_SUPER(tuner_fft);
 }
 
 static QState tuner_ffthist(struct TunerHSM *me) {

@@ -188,8 +188,9 @@ void QF_onIdle(void) {        /* entered with interrupts locked */
 	int i;
 	QF_INT_UNLOCK();                       /* unlock interrupts */
 	// TODO: test nested interrupts, posting from here, stopping?
-	for (i = 0; i < FFT_SIZE; ++i)
+	for (i = 0; i < FFT_SIZE; ++i) {
 		tuner_ao.fft_a[i] -= fft_avg[fai][i];
+	}
 
 	sample(fft_avg[fai]);
 	grab_start();

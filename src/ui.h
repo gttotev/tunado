@@ -40,6 +40,9 @@ void draw_mainmenu_init(int pos);
 void draw_mainmenu_erase(int pos);
 int draw_mainmenu(int pos, int delta);
 
+void draw_octave_init();
+void draw_octave_erase();
+
 void draw_ffthist_init();
 void draw_ffthist_erase();
 void draw_ffthist(float complex *a);

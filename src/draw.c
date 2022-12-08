@@ -11,6 +11,7 @@
 #define SMLFONT_PX_Y(y) ((y)*12)
 #define SVNFONT_PX_X(x) ((x)*32)
 #define SVNFONT_PX_Y(y) ((y)*50)
+#define CENTER_TXT(font, len) ((LCD_X_SIZE - font(len))/2)
 
 #define COLOR_BG 0xCD, 0xEA, 0xC0
 #define COLOR_TXT COLOR_BG
@@ -66,6 +67,21 @@ void draw_mainmenu_erase(int pos) {
 		MAINMENU_X, MAINMENU_Y(i),
 		BIGFONT_PX(strlen(mainmenu_txt[i])), BIGFONT_PX(1)
 	);
+}
+
+#define OCTAVE_X CENTER_TXT(BIGFONT_PX, 13)
+#define OCTAVE_Y 64
+
+void draw_octave_init() {
+	lcd_setFont(BigFont);
+	lcd_setColor(COLOR_TXT);
+	lcd_setColorBg(COLOR_INACTIVE);
+	lcd_print("Unimplemented", OCTAVE_X, OCTAVE_Y);
+}
+
+void draw_octave_erase() {
+	lcd_setColor(COLOR_BG);
+	lcd_rect(OCTAVE_X, OCTAVE_Y, LCD_X_SIZE, BIGFONT_PX(1));
 }
 
 #define FFTHIST_SIZE 512
@@ -154,9 +170,9 @@ void draw_ffthist_erase() {
 	fft_lastbl = -1;
 }
 
-#define TUNER_HZ_X ((LCD_X_SIZE - SVNFONT_PX_X(4))/2)
+#define TUNER_HZ_X CENTER_TXT(SVNFONT_PX_X, 4)
 #define TUNER_HZ_Y 254
-#define TUNER_NOTE_X ((LCD_X_SIZE - BIGFONT_PX(3))/2)
+#define TUNER_NOTE_X CENTER_TXT(BIGFONT_PX, 3)
 #define TUNER_NOTE_Y 64
 #define TUNER_BAR_X (LCD_X_SIZE/2)
 #define TUNER_BAR_Y (TUNER_NOTE_Y*2)
