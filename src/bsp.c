@@ -180,7 +180,6 @@ static void sample(float complex *a) {
 	}
 }
 
-// TODO: make adjustable on octave range
 #define FFTAVG_SIZE 4
 static int fai;
 static float complex fft_avg[FFTAVG_SIZE][FFT_SIZE];

@@ -82,7 +82,7 @@ void draw_ffthist_init() {
 	int i;
 	char buf[32];
 	lcd_setFont(SmallFont);
-	lcd_setColor(COLOR_BG);
+	lcd_setColor(COLOR_TXT);
 	lcd_setColorBg(COLOR_INACTIVE);
 	snprintf(buf, 32, "FFT: %d | bins: %.3f Hz", FFT_SIZE, FFT_RES);
 	lcd_print(buf, 0, FFTHIST_TXT(0));
@@ -117,7 +117,7 @@ void draw_ffthist(float complex *a) {
 		fft_hists[i] = x;
 	}
 
-	lcd_setColor(COLOR_BG);
+	lcd_setColor(COLOR_TXT);
 	lcd_setColorBg(COLOR_INACTIVE);
 	snprintf(buf, 5, "%4d", m);
 	lcd_print(buf, SMLFONT_PX_X(9), FFTHIST_TXT(1));
@@ -183,7 +183,7 @@ void draw_tuner_erase() {
 
 void draw_a4tuner_init() {
 	lcd_setFont(BigFont);
-	lcd_setColor(COLOR_BG);
+	lcd_setColor(COLOR_TXT);
 	lcd_setColorBg(COLOR_INACTIVE);
 	lcd_print(
 		"Hz", TUNER_HZ_X + SVNFONT_PX_X(3)/2,
@@ -269,7 +269,7 @@ void draw_tuner(float complex *a, int a4) {
 		freq = 0;
 	}
 
-	lcd_setColor(COLOR_BG);
+	lcd_setColor(COLOR_TXT);
 	lcd_setColorBg(COLOR_INACTIVE);
 
 	// Note (needs buf)
@@ -292,7 +292,7 @@ void draw_tuner(float complex *a, int a4) {
 void draw_a4tuner(int a4) {
 	char buf[5];
 
-	lcd_setColor(COLOR_BG);
+	lcd_setColor(COLOR_TXT);
 	lcd_setColorBg(COLOR_INACTIVE);
 
 	lcd_setFont(BigFont);
