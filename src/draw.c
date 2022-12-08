@@ -68,10 +68,10 @@ void draw_mainmenu_erase(int pos) {
 	);
 }
 
-#define FFTHIST_SIZE 255
-#define FFTHIST_TXT(i) (FFTHIST_SIZE + SMLFONT_PX_Y(i))
+#define FFTHIST_SIZE 512
+#define FFTHIST_TXT(i) (FFTHIST_SIZE/2 + SMLFONT_PX_Y(i))
 static float fft_mag[FFT_SIZE];
-static int fft_lastbl, fft_hists[FFTHIST_SIZE];
+static int fft_lastbl = -1, fft_hists[FFTHIST_SIZE];
 static char *fft_txts[] = {
 	"Max: bin xxxx(xxxx Hz)",
 	"Range of bins shown:",
@@ -93,26 +93,28 @@ void draw_ffthist_init() {
 
 void draw_ffthist(float complex *a) {
 	char buf[5];
-	int i, x, bl, bh, m = fft_max(a, FFT_SIZE, fft_mag);
-	float scale = LCD_X_SIZE / sqrtf(fft_mag[m]);
+	int i, x, x0, y, bl, bh, m = fft_max(a, FFT_SIZE, fft_mag);
+	float scale = (LCD_X_SIZE/2) / sqrtf(fft_mag[m]);
 
 	bl = m - FFTHIST_SIZE/2;
-	if (bl < 1) bl = 1;
+	if (bl < 0) bl = 0;
 	bh = bl + FFTHIST_SIZE;
 	if (bh > FFT_SIZE/2) {
 		bh = FFT_SIZE/2;
-		bl = bh - FFTHIST_SIZE;
+		bl = MAX(0, bh - FFTHIST_SIZE);
 	}
 
-	for (i = 0; i < FFTHIST_SIZE; ++i) {
+	for (i = 0; i < MIN(FFTHIST_SIZE, FFT_SIZE/2); ++i) {
 		x = sqrtf(fft_mag[bl+i]) * scale;
 		if (x == fft_hists[i]) continue;
+		y = i % (FFTHIST_SIZE/2);
+		x0 = i < FFTHIST_SIZE/2 ? 0 : LCD_X_SIZE/2;
 		if (x > fft_hists[i]) {
 			lcd_setColor(COLOR_ACTIVE);
-			lcd_rect(fft_hists[i], i, x-fft_hists[i], 1);
+			lcd_rect(x0 + fft_hists[i], y, x-fft_hists[i], 1);
 		} else {
 			lcd_setColor(COLOR_BG);
-			lcd_rect(x, i, fft_hists[i]-x, 1);
+			lcd_rect(x0 + x, y, fft_hists[i]-x, 1);
 		}
 		fft_hists[i] = x;
 	}
@@ -126,11 +128,12 @@ void draw_ffthist(float complex *a) {
 
 	if (bl != fft_lastbl) {
 		fft_lastbl = bl;
+		if (!bl) bl = 1;
 		snprintf(buf, 5, "%4d", bl);
 		lcd_print(buf, SMLFONT_PX_X(0), FFTHIST_TXT(3));
 		snprintf(buf, 5, "%4d", (int)(bl*FFT_RES));
 		lcd_print(buf, SMLFONT_PX_X(5), FFTHIST_TXT(3));
-		snprintf(buf, 5, "%4d", bh);
+		snprintf(buf, 5, "%4d", --bh);
 		lcd_print(buf, SMLFONT_PX_X(16), FFTHIST_TXT(3));
 		snprintf(buf, 5, "%4d", (int)(bh*FFT_RES));
 		lcd_print(buf, SMLFONT_PX_X(21), FFTHIST_TXT(3));
@@ -140,12 +143,15 @@ void draw_ffthist(float complex *a) {
 void draw_ffthist_erase() {
 	int i;
 	lcd_setColor(COLOR_BG);
-	for (i = 0; i < FFTHIST_SIZE; ++i) {
-		lcd_rect(0, i, fft_hists[i], 1);
+	for (i = 0; i < MIN(FFTHIST_SIZE, FFT_SIZE/2); ++i) {
+		lcd_rect(
+			i < FFTHIST_SIZE/2 ? 0 : LCD_X_SIZE/2,
+			i % (FFTHIST_SIZE/2), fft_hists[i], 1
+		);
 		fft_hists[i] = 0;
 	}
 	lcd_rect(0, FFTHIST_TXT(0), LCD_X_SIZE, SMLFONT_PX_Y(4));
-	fft_lastbl = 0;
+	fft_lastbl = -1;
 }
 
 #define TUNER_HZ_X ((LCD_X_SIZE - SVNFONT_PX_X(4))/2)
