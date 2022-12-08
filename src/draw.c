@@ -262,7 +262,7 @@ void draw_tuner(float complex *a, int a4) {
 	char buf[5] = " ", *note = "  ";
 	int octave, m = fft_max(a, FFT_SIZE, fft_mag);
 	float fcents = 0, freq = fft_fit(m, fft_mag, FFT_RES);
-	if (freq > 64) {
+	if (freq > 60) {
 		note = note_find(freq, a4, &octave, &fcents);
 		buf[0] = '0' + octave;
 	} else {

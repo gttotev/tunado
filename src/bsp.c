@@ -181,7 +181,7 @@ static void sample(float complex *a) {
 }
 
 // TODO: make adjustable on octave range
-#define FFTAVG_SIZE 2
+#define FFTAVG_SIZE 4
 static int fai;
 static float complex fft_avg[FFTAVG_SIZE][FFT_SIZE];
 
@@ -196,8 +196,10 @@ void QF_onIdle(void) {        /* entered with interrupts locked */
 	grab_start();
 	rufft(fft_avg[fai], FFT_SIZE);
 
-	for (i = 0; i < FFT_SIZE; ++i)
+	for (i = 0; i < FFT_SIZE; ++i) {
+		fft_avg[fai][i] /= FFTAVG_SIZE;
 		tuner_ao.fft_a[i] += fft_avg[fai][i];
+	}
 	fai = (fai + 1) % FFTAVG_SIZE;
 
 	QActive_post((QActive *)&tuner_ao, SIG_FFT_DONE);
